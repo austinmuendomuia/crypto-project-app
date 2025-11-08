@@ -1,0 +1,130 @@
+// import React from 'react';
+// import styled from 'styled-components';
+
+// const PageWrapper = styled.div`
+//   min-height: 100vh;
+//   background: linear-gradient(120deg,#0062ff 0%,#52e5e7 100%);
+//   display: flex;
+//   flex-direction: column;
+//   align-items: center;
+//   padding: 600px 0 0 0px;
+// `;
+
+// const Title = styled.h1`
+//   color: #262c4b;
+//   font-size: 2.5rem;
+//   margin-bottom: 34px;
+//   font-weight: 700;
+// `;
+
+// const Section = styled.div`
+//   background: #fff;
+//   border-radius: 76px;
+//   box-shadow: 0 10px 44px #cbdaee29;
+//   padding: 54px 108px;
+//   max-width: 540px;
+// `;
+
+// const Button = styled.button`
+//   background: #27d37f;
+//   color: white;
+//   font-size: 2.25rem;
+//   border: none;
+//   border-radius: 30px;
+//   padding: 26px 44px;
+//   font-weight: 800;
+//   cursor: pointer;
+//   margin-top: 32px;
+// `;
+
+// export default function DecryptFiles() {
+//     const handleDecrypt = () => {
+//         alert('Starting decryption... (implement your logic here)');
+//     };
+
+//     return (
+//         <PageWrapper>
+//             <Title>Decrypt Files / Media</Title>
+//             <Section>
+//                 <h2 style={{ fontSize: "40px" }}>Decrypt your encrypted items here.</h2>
+//                 <Button onClick={handleDecrypt}>Click to Decrypt Files/Images/Videos</Button>
+//             </Section>
+//         </PageWrapper>
+//     );
+// }
+
+
+
+import React, { useState } from 'react';
+import styled from 'styled-components';
+import logo from '../resources/logo.png';
+
+const PageWrapper = styled.div`
+  min-height: 100vh;
+  background: url(${logo}) center center/cover no-repeat;
+  //background: linear-gradient(120deg,#0062ff 0%,#52e5e7 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 600px 0 0 0px;
+`;
+
+const Title = styled.h1`
+  color: #262c4b;
+  font-size: 2.5rem;
+  margin-bottom: 34px;
+  font-weight: 700;
+`;
+
+const Section = styled.div`
+  background: #fff;
+  border-radius: 76px;
+  box-shadow: 0 10px 44px #cbdaee29;
+  padding: 54px 108px;
+  max-width: 540px;
+`;
+
+const Button = styled.button`
+  background: #27d37f;
+  color: white;
+  font-size: 2.25rem;
+  border: none;
+  border-radius: 30px;
+  padding: 26px 44px;
+  font-weight: 800;
+  cursor: pointer;
+  margin-top: 32px;
+`;
+
+export default function DecryptFiles() {
+    const [decrypted, setDecrypted] = useState(null);
+
+    // Simulate a decrypted result
+    const simulateDecrypt = () => {
+        setDecrypted({
+            name: "SampleDecryptedFile.txt",
+            type: "text/plain",
+            size: 3072,
+            message: "Example decrypted file available for download or viewing."
+        });
+    };
+
+    return (
+        <PageWrapper>
+            <Title style={{ color: "green" }}>Decrypt Files / Media</Title>
+            <Section>
+                <h2 style={{ fontSize: "40px" }}>Decrypt your encrypted items here.</h2>
+                {!decrypted ? (
+                    <Button onClick={simulateDecrypt} style={{ fontSize: "31px" }}>Click to Decrypt Files/Images/Videos</Button>
+                ) : (
+                    <div style={{ textAlign: "center" }}>
+                        <h2 style={{ fontSize: "40px", margin: "28px 0 8px" }}>Decrypted File</h2>
+                        <div style={{ fontSize: "29px", fontWeight: 600 }}>{decrypted.name}</div>
+                        <div style={{ color: "#357", fontSize: "27px" }}>{decrypted.type} — {Math.round(decrypted.size / 1024)} KB</div>
+                        <div style={{ margin: "18px 0", color: "#94b3c7" }}>{decrypted.message}</div>
+                    </div>
+                )}
+            </Section>
+        </PageWrapper>
+    );
+}
