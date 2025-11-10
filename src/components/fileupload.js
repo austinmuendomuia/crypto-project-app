@@ -5,11 +5,10 @@ import logo from '../resources/logo.png';
 const PageWrapper = styled.div`
   min-height: 100vh;
   background: url(${logo}) center center/cover no-repeat;
-  //background: linear-gradient(120deg,#33aaff 0%,#62e5e7 100%);
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 600px 0 0 60px;
+  padding: 60px 0 0 60px;
 `;
 
 const Title = styled.h1`
@@ -55,35 +54,69 @@ const Button = styled.button`
   cursor: pointer;
 `;
 
-export default function UploadMedia1() {
-    const [media, setMedia] = useState(null);
+export default function FileUpload() {
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [encKey, setEncKey] = useState('');
+  const [nonce, setNonce] = useState('');
+  const [tag, setTag] = useState('');
+  const [ciphertext, setCiphertext] = useState('');
+  const [error, setError] = useState('');
 
-    const handleFileChange = e => {
-        const selected = e.target.files[0];
-        if (selected && (selected.type.startsWith('image/') || selected.type.startsWith('video/'))) {
-            setMedia(selected);
-        } else {
-            setMedia(null);
-            alert('Only image or video files are allowed for this input.');
-        }
-    };
+  const handleFileChange = e => {
+    const file = e.target.files[0];
+    if (file && (file.type.startsWith('image/') || file.type.startsWith('video/'))) {
+      setSelectedFile(file);
+      setError('');
+    } else {
+      setSelectedFile(null);
+      setError('Only image or video files are allowed for this input.');
+    }
+  };
 
-    const handleUpload = e => {
-        e.preventDefault();
-        alert('Image/video selected: ' + (media && media.name));
-        // Real upload logic here
-    };
+  const handleUpload = e => {
+    e.preventDefault();
+    if (!selectedFile) {
+      setError('Please choose a valid image or video file.');
+      return;
+    }
+    setError('');
+    const formData = new FormData();
+    formData.append('file', selectedFile);
+    fetch('http://localhost:5000/encrypt', {
+      method: 'POST',
+      body: formData
+    })
+      .then(response => response.json())
+      .then(data => {
+        setEncKey(data.enc_key);
+        setNonce(data.nonce);
+        setTag(data.tag);
+        setCiphertext(data.ciphertext);
+        setError('');
+      })
+      .catch(err => setError('Encryption error: ' + err.message));
+  };
 
-    return (
-        <PageWrapper>
-            <Title style={{ color: "red" }}>Encrypt Images/Videos</Title>
-            <Section>
-                <form onSubmit={handleUpload}>
-                    <Label>Choose an image or video:</Label>
-                    <Input type="file" accept="image/*,video/*" onChange={handleFileChange} />
-                    <Button type="submit">Encrypt Media</Button>
-                </form>
-            </Section>
-        </PageWrapper>
-    );
+  return (
+    <PageWrapper>
+      <Title style={{ color: "red" }}>Encrypt Images/Videos</Title>
+      <Section>
+        <form onSubmit={handleUpload}>
+          <Label>Choose an image or video:</Label>
+          <Input type="file" accept="image/*,video/*" onChange={handleFileChange} />
+          <Button type="submit">Encrypt Media</Button>
+        </form>
+        {error && <p style={{ color: "red" }}>{error}</p>}
+        {encKey && (
+          <div style={{ marginTop: 24 }}>
+            <h3>Encrypted Results</h3>
+            <p><strong>Encrypted Key:</strong> {encKey}</p>
+            <p><strong>Nonce:</strong> {nonce}</p>
+            <p><strong>Tag:</strong> {tag}</p>
+            <p><strong>Ciphertext:</strong> {ciphertext}</p>
+          </div>
+        )}
+      </Section>
+    </PageWrapper>
+  );
 }
