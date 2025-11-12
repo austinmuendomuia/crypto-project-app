@@ -2,20 +2,25 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import logo from '../resources/logo.png';
 
+
+
 const PageWrapper = styled.div`
   min-height: 100vh;
   background: url(${logo}) center center/cover no-repeat;
+  //background: linear-gradient(120deg,#0062ff 0%,#52e5e7 100%);
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 60px 0 0 60px;
+  padding: 500px 0 0 60px;
 `;
+
 const Title = styled.h1`
   color: #262c4b;
   font-size: 2.6rem;
   margin-bottom: 48px;
   font-weight: 700;
 `;
+
 const Section = styled.div`
   background: #fff;
   border-radius: 56px;
@@ -23,6 +28,7 @@ const Section = styled.div`
   padding: 54px 98px;
   max-width: 540px;
 `;
+
 const Label = styled.label`
   font-size: 1.5rem;
   font-weight: 500;
@@ -30,6 +36,7 @@ const Label = styled.label`
   margin-bottom: 20px;
   display: block;
 `;
+
 const Input = styled.input`
   font-size: 1.8rem;
   padding: 18px;
@@ -38,6 +45,7 @@ const Input = styled.input`
   border: 7.5px solid #ccc;
   width: 100%;
 `;
+
 const TextArea = styled.textarea`
   font-size: 1.8rem;
   padding: 18px;
@@ -47,6 +55,7 @@ const TextArea = styled.textarea`
   width: 100%;
   resize: vertical;
 `;
+
 const Button = styled.button`
   background: #0062ff;
   color: white;
@@ -62,92 +71,88 @@ const Button = styled.button`
   }
 `;
 
-export default function EncryptFiles() {
+
+export default function EncryptFiles1({ username }) {
   const [text, setText] = useState('');
   const [file, setFile] = useState(null);
-  const [encKey, setEncKey] = useState('');
-  const [nonce, setNonce] = useState('');
-  const [tag, setTag] = useState('');
-  const [ciphertext, setCiphertext] = useState('');
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [customFilename, setCustomFilename] = useState("");
+
 
   const handleFileChange = e => {
     const selected = e.target.files[0];
-    // Accept only non-image/non-video files
-    if (selected && !selected.type.startsWith('image/') && !selected.type.startsWith('video/')) {
-      setFile(selected);
-      setError('');
-    } else {
-      setFile(null);
-      setError('Only non-image/non-video files are allowed for this input.');
-    }
-  };
+    // Accept only non-image/video files
+    // if (selected && !selected.type.startsWith('image/') && !selected.type.startsWith('video/')) {
+    // setFile(selected);
+    //} else {
+    //setFile(null);
+    //alert('Only non-image/non-video files are allowed for this input.');
+  }
 
-  const handleEncrypt = e => {
+  // const handleEncrypt = async e => {
+  //   e.preventDefault();
+  //   let filename = file ? file.name : customFilename || `TextEntry_${new Date().toISOString()}`;
+  //   //let filename = file ? file.name : "TextEntry";
+  //   //let filetype = file ? file.type : "text/plain";
+  //   let content = text;
+  //   if (file) {
+  //     content = await file.text();
+  //   }
+  //   try {
+  //     const res = await fetch('http://localhost:5000/api/encrypt-file', {
+  //       method: 'POST',
+  //       headers: { 'Content-Type': 'application/json' },
+  //       body: JSON.stringify({ username, filename, filetype, content })
+  //     });
+  //     if (!res.ok) throw new Error("Encryption failure");
+  //     alert('Encrypt request submitted! File stored securely.');
+  //     setText(''); setFile(null);
+  //   } catch (err) {
+  //     alert("Encryption failed");
+  //   }
+  // };
+
+  const handleEncrypt = async e => {
     e.preventDefault();
-    setError('');
-    setLoading(true);
-
-    const formData = new FormData();
-    formData.append('text', text);
-    if (file) {
-      formData.append('file', file);
-    }
-
-    fetch('http://localhost:5000/encrypt', {
-      method: 'POST',
-      body: formData
-    })
-      .then(response => response.json())
-      .then(data => {
-        setLoading(false);
-        setEncKey(data.enc_key);
-        setNonce(data.nonce);
-        setTag(data.tag);
-        setCiphertext(data.ciphertext);
-      })
-      .catch(error => {
-        setLoading(false);
-        setError('Encryption error: ' + error.message);
+    let filename = customFilename || `TextEntry_${new Date().toISOString()}`;
+    let content = text;
+    try {
+      const res = await fetch('http://localhost:5000/api/encrypt-file', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, filename, filetype: "text/plain", content })
       });
+      if (!res.ok) throw new Error("Encryption failure");
+      alert('Text encrypted and stored!');
+      setText(''); setCustomFilename('');
+    } catch (err) {
+      alert("Encryption failed");
+    }
   };
+
 
   return (
     <PageWrapper>
       <Title style={{ color: "red" }}>Encrypt Text &amp; Files</Title>
       <Section>
+
         <form onSubmit={handleEncrypt}>
-          <Label style={{ fontWeight: "bold", fontSize: "30px" }}>Input Text to Encrypt:</Label>
-          <TextArea
-            rows={4}
-            value={text}
-            onChange={e => setText(e.target.value)}
-            placeholder="Type text..."
+          <Input
+            type="text"
+            placeholder="Enter filename for text..."
+            value={customFilename}
+            onChange={e => setCustomFilename(e.target.value)}
+            style={{ marginBottom: "1rem" }}
           />
-          <Label style={{ fontWeight: "bold", fontSize: "30px" }}>Choose a file (no images/videos):</Label>
-          <Input type="file" onChange={handleFileChange} />
-          <Button type="submit" disabled={loading}>Encrypt</Button>
-          {loading && <div style={{ marginTop: 12 }}>Encrypting...</div>}
-          {error && <p style={{ color: "red" }}>{error}</p>}
+          <Label style={{ fontWeight: "bold", fontSize: "30px" }}>Input Text to Encrypt:</Label>
+          <TextArea rows={4} value={text} onChange={e => setText(e.target.value)} placeholder="Type text..." />
+          {/* //<Label style={{ fontWeight: "bold", fontSize: "30px" }}>Choose a file (no images/videos):</Label>
+          //<Input type="file" onChange={handleFileChange} /> */}
+          <Button type="submit">Encrypt</Button>
         </form>
-      {(encKey || nonce || tag || ciphertext) && (
-  <div className="encrypted-result-box">
-    <span className="result-label">Encrypted Key:</span>
-    {encKey}
-    <br /><br />
-    <span className="result-label">Nonce:</span>
-    {nonce}
-    <br /><br />
-    <span className="result-label">Tag:</span>
-    {tag}
-    <br /><br />
-    <span className="result-label">Ciphertext:</span>
-    {ciphertext}
-  </div>
-)}
 
       </Section>
     </PageWrapper>
   );
 }
+
+

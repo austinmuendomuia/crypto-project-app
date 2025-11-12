@@ -165,6 +165,60 @@
 
 
 
+// import React, { useState } from 'react';
+// import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+// import Sidebar from './components/sidebar';
+// import Login from './components/Login';
+// import Dashboard from './components/Dashboard';
+// import Register from './components/register';
+// import EncryptFiles1 from './components/EncryptFiles';
+// import UploadMedia1 from './components/fileupload';
+// import DecryptFiles from './components/DecryptFiles';
+// import ViewEncrypted1 from './components/viewEncrypted';
+
+
+// function EncryptFiles() { return <div style={{ padding: 40 }}><h1>Encrypt Text & Files</h1><h2>Upload text docs or files to encrypt.</h2></div>; }
+// function UploadMedia() { return <div style={{ padding: 40 }}><h1>Encrypt Images/Videos</h1><h2>Upload images or videos to encrypt.</h2></div>; }
+// function DecryptFilesOrMedia() { return <div style={{ padding: 40 }}><h1>Decrypt Files / Media</h1><h2>Decrypt your encrypted items here.</h2></div>; }
+// //function ViewDecrypted() { return <div style={{ padding: 40 }}><h1>View Decrypted</h1><h2>See what you've decrypted.</h2></div>; }
+
+// export default function App() {
+//     const [showLogin, setShowLogin] = useState(true);
+//     const [username, setUsername] = useState('');
+
+//     const handleLogin = (enteredUsername) => {
+//         setUsername(enteredUsername);
+//         setShowLogin(false);
+//     };
+
+//     const handleLogout = () => {
+//         setShowLogin(true);
+//         setUsername('');
+//     };
+
+//     return (
+//         <Router>
+//             <div style={{ display: 'flex' }}>
+//                 {/* Sidebar only visible when logged in (no login/register sidebar) */}
+//                 {!showLogin && (
+//                     <Sidebar onLogout={handleLogout} />
+//                 )}
+//                 <main style={{ flex: 1 }}>
+//                     <Routes>
+//                         <Route path="/" element={showLogin ? <Login onLogin={handleLogin} /> : <Dashboard username={username} />} />
+//                         <Route path="/register" element={<Register />} />
+//                         <Route path="/encrypt-files" element={<EncryptFiles1 />} />
+//                         <Route path="/upload-media" element={<UploadMedia1 />} />
+//                         <Route path="/decrypt-files-or-media" element={<DecryptFiles />} />
+//                         <Route path="/view-Encrypted" element={<ViewEncrypted1 />} />
+//                     </Routes>
+//                 </main>
+//             </div>
+//         </Router>
+//     );
+// }
+
+
 import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Sidebar from './components/sidebar';
@@ -177,40 +231,38 @@ import DecryptFiles from './components/DecryptFiles';
 import ViewEncrypted1 from './components/viewEncrypted';
 
 
-function EncryptFiles() { return <div style={{ padding: 40 }}><h1>Encrypt Text & Files</h1><h2>Upload text docs or files to encrypt.</h2></div>; }
-function UploadMedia() { return <div style={{ padding: 40 }}><h1>Encrypt Images/Videos</h1><h2>Upload images or videos to encrypt.</h2></div>; }
-function DecryptFilesOrMedia() { return <div style={{ padding: 40 }}><h1>Decrypt Files / Media</h1><h2>Decrypt your encrypted items here.</h2></div>; }
-//function ViewDecrypted() { return <div style={{ padding: 40 }}><h1>View Decrypted</h1><h2>See what you've decrypted.</h2></div>; }
 
 export default function App() {
     const [showLogin, setShowLogin] = useState(true);
     const [username, setUsername] = useState('');
+    const [userProfile, setUserProfile] = useState(null);
 
-    const handleLogin = (enteredUsername) => {
+    const handleLogin = (enteredUsername, profileImage) => {
         setUsername(enteredUsername);
+        setUserProfile(profileImage);
         setShowLogin(false);
     };
 
     const handleLogout = () => {
         setShowLogin(true);
         setUsername('');
+        setUserProfile(null);
     };
 
     return (
         <Router>
             <div style={{ display: 'flex' }}>
-                {/* Sidebar only visible when logged in (no login/register sidebar) */}
                 {!showLogin && (
                     <Sidebar onLogout={handleLogout} />
                 )}
                 <main style={{ flex: 1 }}>
                     <Routes>
-                        <Route path="/" element={showLogin ? <Login onLogin={handleLogin} /> : <Dashboard username={username} />} />
+                        <Route path="/" element={showLogin ? <Login onLogin={handleLogin} /> : <Dashboard username={username} profileImage={userProfile} />} />
                         <Route path="/register" element={<Register />} />
-                        <Route path="/encrypt-files" element={<EncryptFiles1 />} />
-                        <Route path="/upload-media" element={<UploadMedia1 />} />
-                        <Route path="/decrypt-files-or-media" element={<DecryptFiles />} />
-                        <Route path="/view-Encrypted" element={<ViewEncrypted1 />} />
+                        <Route path="/encrypt-files" element={<EncryptFiles1 username={username} />} />
+                        <Route path="/upload-media" element={<UploadMedia1 username={username} />} />
+                        <Route path="/decrypt-files-or-media" element={<DecryptFiles username={username} />} />
+                        <Route path="/view-Encrypted" element={<ViewEncrypted1 username={username} />} />
                     </Routes>
                 </main>
             </div>

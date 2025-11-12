@@ -55,120 +55,141 @@
 
 
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import logo from '../resources/logo.png';
 
 const PageWrapper = styled.div`
   min-height: 100vh;
   background: url(${logo}) center center/cover no-repeat;
+  //background: linear-gradient(120deg,#0062ff 0%,#52e5e7 100%);
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 60px 0 0 0; /* less extreme padding */
+  padding: 600px 0 0 0px;
 `;
+
 const Title = styled.h1`
   color: #262c4b;
   font-size: 2.5rem;
   margin-bottom: 34px;
   font-weight: 700;
 `;
+
 const Section = styled.div`
   background: #fff;
-  border-radius: 32px;
+  border-radius: 76px;
   box-shadow: 0 10px 44px #cbdaee29;
-  padding: 44px 54px;
+  padding: 54px 108px;
   max-width: 540px;
 `;
+
 const Button = styled.button`
   background: #27d37f;
   color: white;
-  font-size: 1.25rem;
+  font-size: 2.25rem;
   border: none;
-  border-radius: 18px;
-  padding: 12px 28px;
+  border-radius: 30px;
+  padding: 26px 44px;
   font-weight: 800;
   cursor: pointer;
-  margin-top: 24px;
+  margin-top: 32px;
 `;
 
-export default function DecryptFiles() {
-  // State for decrypt fields and result
-  const [encryptedKey, setEncryptedKey] = useState('');
-  const [nonce, setNonce] = useState('');
-  const [tag, setTag] = useState('');
-  const [ciphertext, setCiphertext] = useState('');
-  const [decryptedResult, setDecryptedResult] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState(null);
+const FileItem = styled.li`
+  font-size: 2.55rem;
+  margin-bottom: 22px;
+  color: #353c56;
+  background: #f1f2fa;
+  border-radius: 14px;
+  padding: 14px 20px;
+  font-weight: 600;
+  border: 1.5px solid #badcff;
+  box-shadow: 0 3px 10px #bedcff23;
+`;
 
-  function handleDecrypt(event) {
-    event.preventDefault();
-    setError(null);
-    setIsLoading(true);
-    fetch('http://localhost:5000/decrypt', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        enc_key: encryptedKey,
-        nonce: nonce,
-        tag: tag,
-        ciphertext: ciphertext
-      })
-    })
-      .then(response => response.text())
-      .then(decrypted => {
-        setIsLoading(false);
-        setDecryptedResult(decrypted);
-      })
-      .catch(error => {
-        setIsLoading(false);
-        setError('Decryption error: ' + error.message);
-      });
-  }
+// export default function DecryptFiles() {
+//     const [decrypted, setDecrypted] = useState(null);
 
-  return (
-    <PageWrapper>
-      <Title>Decrypt Files / Media</Title>
-      <Section>
-        <h2 style={{ fontSize: '32px' }}>Decrypt your encrypted items here.</h2>
-        <form onSubmit={handleDecrypt} style={{ marginTop: 28 }}>
-          <input
-            placeholder="Encrypted Key"
-            value={encryptedKey}
-            onChange={e => setEncryptedKey(e.target.value)}
-            style={{ width: '100%', marginBottom: 8, padding: 8 }}
-          />
-          <input
-            placeholder="Nonce"
-            value={nonce}
-            onChange={e => setNonce(e.target.value)}
-            style={{ width: '100%', marginBottom: 8, padding: 8 }}
-          />
-          <input
-            placeholder="Tag"
-            value={tag}
-            onChange={e => setTag(e.target.value)}
-            style={{ width: '100%', marginBottom: 8, padding: 8 }}
-          />
-          <input
-            placeholder="Ciphertext"
-            value={ciphertext}
-            onChange={e => setCiphertext(e.target.value)}
-            style={{ width: '100%', marginBottom: 8, padding: 8 }}
-          />
-          <Button type="submit">Decrypt</Button>
-        </form>
-        {isLoading && <div style={{ marginTop: 16, color: '#666' }}>Decrypting...</div>}
-        {error && <div style={{ color: 'red', marginTop: 16 }}>{error}</div>}
-      {decryptedResult && (
-       <div className="encrypted-result-box">
-        <span className="result-label">Decryption Result:</span>
-        {decryptedResult}
-     </div>
-      )}
+//     // Simulate a decrypted result
+//     const simulateDecrypt = () => {
+//         setDecrypted({
+//             name: "SampleDecryptedFile.txt",
+//             type: "text/plain",
+//             size: 3072,
+//             message: "Example decrypted file available for download or viewing."
+//         });
+//     };
 
-      </Section>
-    </PageWrapper>
-  );
+//     return (
+//         <PageWrapper>
+//             <Title style={{ color: "green" }}>Decrypt Files / Media</Title>
+//             <Section>
+//                 <h2 style={{ fontSize: "40px" }}>Decrypt your encrypted items here.</h2>
+//                 {!decrypted ? (
+//                     <Button onClick={simulateDecrypt} style={{ fontSize: "31px" }}>Click to Decrypt Files/Images/Videos</Button>
+//                 ) : (
+//                     <div style={{ textAlign: "center" }}>
+//                         <h2 style={{ fontSize: "40px", margin: "28px 0 8px" }}>Decrypted File</h2>
+//                         <div style={{ fontSize: "29px", fontWeight: 600 }}>{decrypted.name}</div>
+//                         <div style={{ color: "#357", fontSize: "27px" }}>{decrypted.type} — {Math.round(decrypted.size / 1024)} KB</div>
+//                         <div style={{ margin: "18px 0", color: "#94b3c7" }}>{decrypted.message}</div>
+//                     </div>
+//                 )}
+//             </Section>
+//         </PageWrapper>
+//     );
+// }
+
+
+export default function DecryptFiles({ username }) {
+    const [encryptedFiles, setEncryptedFiles] = useState([]);
+    const [decrypted, setDecrypted] = useState(null);
+    useEffect(() => {
+        fetch(`http://localhost:5000/api/encrypted-files/${username}`)
+            .then(res => res.json()).then(setEncryptedFiles)
+            .catch(() => setEncryptedFiles([]));
+    }, [username]);
+    const handleDecrypt = async (fileId) => {
+        try {
+            const res = await fetch('http://localhost:5000/api/decrypt-file', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, fileId })
+            });
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.error || "Decrypt error");
+            setDecrypted(data);
+        } catch (err) {
+            alert("Decryption failed");
+        }
+    };
+    return (
+        <PageWrapper>
+            <Title style={{ color: "green" }}>Decrypt Files / Media</Title>
+            <Section>
+                <h2 style={{ fontSize: "40px" }}>Decrypt your encrypted items here.</h2>
+                {!decrypted ? (
+                    <>
+                        {encryptedFiles.map(file => (
+                            <div key={file.id} style={{ marginBottom: 24 }}>
+                                <FileItem>
+                                    <div><b>{file.filename}</b></div>
+                                    <div style={{ fontSize: "1.08rem", color: "#7599a9" }}>{file.filetype} — {file.encrypted_at}</div>
+                                    <Button onClick={() => handleDecrypt(file.id)} style={{ fontSize: "21px", marginTop: 10 }}>Decrypt This File</Button>
+                                </FileItem>
+                            </div>
+                        ))}
+                    </>
+                ) : (
+                    <div style={{ textAlign: "center" }}>
+                        <h2 style={{ fontSize: "40px", margin: "28px 0 8px" }}>Decrypted File</h2>
+                        <div style={{ fontSize: "29px", fontWeight: 600 }}>{decrypted.filename}</div>
+                        <div style={{ color: "#357", fontSize: "27px" }}>{decrypted.filetype}</div>
+                        <div style={{ margin: "18px 0", fontSize: "2.5rem", color: "#df1708ff" }}>{decrypted.content}</div>
+                    </div>
+                )}
+            </Section>
+        </PageWrapper>
+    );
 }

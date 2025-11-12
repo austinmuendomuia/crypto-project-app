@@ -61,6 +61,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import logo from '../resources/logo.png';
+import { useState, useEffect } from 'react';
 
 const PageWrapper = styled.div`
   min-height: 100vh;
@@ -92,10 +93,11 @@ const FileList = styled.ul`
   list-style: none;
   padding: 0;
   margin: 0 0 38px 0;
+  font-size: 1.05rem;
 `;
 
 const FileItem = styled.li`
-  font-size: 1.55rem;
+  font-size: 2.55rem;
   margin-bottom: 22px;
   color: #353c56;
   background: #f1f2fa;
@@ -104,16 +106,19 @@ const FileItem = styled.li`
   font-weight: 600;
   border: 1.5px solid #badcff;
   box-shadow: 0 3px 10px #bedcff23;
+  max-width: 480px;
+  word-break: break-word;
+  overflow-wrap:anywhere;
+  white-space: normal;
 `;
 
-export default function ViewEncrypted1() {
-  // Replace this with real data/query from server in future!
-  const encryptedFiles = [
-    { name: "ImportantDoc.pdf", type: "application/pdf", date: "2025-11-07 20:50" },
-    { name: "Resume.docx", type: "application/vnd.openxmlformats", date: "2025-11-08 11:31" },
-    { name: "my_photo.zip", type: "application/zip", date: "2025-11-08 14:42" }
-  ];
-
+export default function ViewEncrypted1({ username }) {
+  const [encryptedFiles, setEncryptedFiles] = useState([]);
+  useEffect(() => {
+    fetch(`http://localhost:5000/api/encrypted-files/${username}`)
+      .then(res => res.json()).then(setEncryptedFiles)
+      .catch(() => setEncryptedFiles([]));
+  }, [username]);
   return (
     <PageWrapper>
       <Title style={{ fontWeight: "bold", color: "red" }}>View Encrypted</Title>
@@ -121,9 +126,18 @@ export default function ViewEncrypted1() {
         <h2 style={{ fontSize: "30px" }}>All your Encrypted Files:</h2>
         <FileList>
           {encryptedFiles.map(file => (
-            <FileItem key={file.name + file.date}>
-              <div><b>{file.name}</b></div>
-              <div style={{ fontSize: "1.08rem", color: "#7599a9" }}>{file.type} — encrypted on {file.date}</div>
+            <FileItem key={file.id}>
+              <div style={{
+                fontSize: "2.3rem",
+                fontWeight: "bold",
+                whiteSpace: "normal",
+                overflowWrap: "anywhere",
+                wordBreak: "break-word",
+                maxWidth: "100%"
+              }}>
+                {file.filename}
+              </div>
+              <div style={{ fontSize: "2.18rem", color: "#7599a9" }}>{file.filetype} — encrypted on {file.encrypted_at}</div>
             </FileItem>
           ))}
         </FileList>
