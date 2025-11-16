@@ -80,36 +80,10 @@ export default function EncryptFiles1({ username }) {
 
   const handleFileChange = e => {
     const selected = e.target.files[0];
-    // Accept only non-image/video files
-    // if (selected && !selected.type.startsWith('image/') && !selected.type.startsWith('video/')) {
-    // setFile(selected);
-    //} else {
-    //setFile(null);
-    //alert('Only non-image/non-video files are allowed for this input.');
+
   }
 
-  // const handleEncrypt = async e => {
-  //   e.preventDefault();
-  //   let filename = file ? file.name : customFilename || `TextEntry_${new Date().toISOString()}`;
-  //   //let filename = file ? file.name : "TextEntry";
-  //   //let filetype = file ? file.type : "text/plain";
-  //   let content = text;
-  //   if (file) {
-  //     content = await file.text();
-  //   }
-  //   try {
-  //     const res = await fetch('http://localhost:5000/api/encrypt-file', {
-  //       method: 'POST',
-  //       headers: { 'Content-Type': 'application/json' },
-  //       body: JSON.stringify({ username, filename, filetype, content })
-  //     });
-  //     if (!res.ok) throw new Error("Encryption failure");
-  //     alert('Encrypt request submitted! File stored securely.');
-  //     setText(''); setFile(null);
-  //   } catch (err) {
-  //     alert("Encryption failed");
-  //   }
-  // };
+
 
   const handleEncrypt = async e => {
     e.preventDefault();

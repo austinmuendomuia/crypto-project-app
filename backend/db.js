@@ -15,4 +15,14 @@ pool.on('error', (err) => {
     process.exit(-1);
 });
 
+
+pool.query('SELECT NOW()', (err, res) => {
+    if (err) {
+        console.error('DB ERROR:', err);
+    } else {
+        console.log('DB READY:', res.rows[0]);
+    }
+});
+
+
 module.exports = pool;
