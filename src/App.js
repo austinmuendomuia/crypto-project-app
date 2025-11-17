@@ -8,6 +8,8 @@ import EncryptFiles1 from './components/EncryptFiles';
 import UploadMedia1 from './components/fileupload';
 import DecryptFiles from './components/DecryptFiles';
 import ViewEncrypted1 from './components/viewEncrypted';
+// import DemoExplanationPage from './components/DemoPage';
+
 
 
 

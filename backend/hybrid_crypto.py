@@ -1,10 +1,14 @@
 import sys
 import os
 import base64
+import hashlib
 from cryptography.hazmat.primitives import serialization, hashes, padding as sympad
 from cryptography.hazmat.primitives.asymmetric import padding, rsa
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.backends import default_backend
+
+def sha256_hash(data):
+    return hashlib.sha256(data.encode('utf-8')).hexdigest()
 
 def load_public_key(path):
     with open(path, 'rb') as f:
@@ -18,6 +22,9 @@ def hybrid_encrypt(public_key_path, plaintext):
     public_key = load_public_key(public_key_path)
     aes_key = os.urandom(32)  # AES-256 key
     iv = os.urandom(16)
+
+    hash_val = sha256_hash(plaintext)
+     
 
     padder = sympad.PKCS7(128).padder()
     padded_data = padder.update(plaintext.encode('utf-8')) + padder.finalize()
@@ -34,6 +41,9 @@ def hybrid_encrypt(public_key_path, plaintext):
     print(base64.b64encode(ciphertext).decode('utf-8'))
     print(base64.b64encode(encrypted_key).decode('utf-8'))
     print(base64.b64encode(iv).decode('utf-8'))
+
+   
+    print(hash_val)  # SHA-256 hash of the plaintext/base64 content
 
 
 def hybrid_decrypt(private_key_path, ciphertext_b64, encrypted_key_b64, iv_b64):
@@ -108,21 +118,25 @@ if __name__ == "__main__":
     # Message:   python hybrid_crypto.py decrypt private.pem ciphertext_b64 key_b64 iv_b64
     # File:      python hybrid_crypto.py encrypt_file public.pem filename
     # File:      python hybrid_crypto.py decrypt_file private.pem filename.enc filename.key filename.iv outputfile
+    
     mode = sys.argv[1]
     if mode == "encrypt":
         pubkey = sys.argv[2]
         message = sys.argv[3]
         hybrid_encrypt(pubkey, message)
+
     elif mode == "decrypt":
         privkey = sys.argv[2]
         ciphertext_b64 = sys.argv[3]
         encrypted_key_b64 = sys.argv[4]
         iv_b64 = sys.argv[5]
         hybrid_decrypt(privkey, ciphertext_b64, encrypted_key_b64, iv_b64)
+
     elif mode == "encrypt_file":
         pubkey = sys.argv[2]
         filepath = sys.argv[3]
         hybrid_encrypt_file(pubkey, filepath)
+
     elif mode == "decrypt_file":
         privkey = sys.argv[2]
         enc_path = sys.argv[3]
@@ -130,6 +144,7 @@ if __name__ == "__main__":
         iv_path = sys.argv[5]
         output_path = sys.argv[6]
         hybrid_decrypt_file(privkey, enc_path, key_path, iv_path, output_path)
+
     else:
         print("Usage error: See code comments for usage.", file=sys.stderr)
         sys.exit(1)

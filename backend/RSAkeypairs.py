@@ -20,7 +20,7 @@ pem_public = private_key.public_key().public_bytes(
     format=serialization.PublicFormat.SubjectPublicKeyInfo
 )
 
-# Save the keys to files (for demonstration)
+# Save the keys to files 
 with open("private.pem", "wb") as f:
     f.write(pem_private)
 
